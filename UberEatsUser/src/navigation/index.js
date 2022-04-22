@@ -10,6 +10,7 @@ import ProfileScreen from "../screens/ProfileScreen";
 import { useAuthContext } from "../contexts/AuthContext";
 
 import { Foundation, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import OrderDetailsNavigator from "./OrderDetailsNavigator";
 
 const Stack = createNativeStackNavigator();
 
@@ -45,7 +46,7 @@ const HomeTabs = () => {
         }}
       />
       <Tab.Screen
-        name="Orders"
+        name="OrdersTab"
         component={OrderStackNavigator}
         options={{
           tabBarIcon: ({ color }) => (
@@ -89,7 +90,11 @@ const OrderStackNavigator = () => {
   return (
     <OrdersStack.Navigator>
       <OrdersStack.Screen name="Orders" component={OrdersScreen} />
-      <OrdersStack.Screen name="Order" component={OrderDetails} />
+      <OrdersStack.Screen
+        name="Order"
+        component={OrderDetailsNavigator}
+        screenOptions={{ headerShown: false }}
+      />
     </OrdersStack.Navigator>
   );
 };

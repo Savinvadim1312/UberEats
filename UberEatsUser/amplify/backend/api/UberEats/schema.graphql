@@ -1,3 +1,17 @@
+enum TransportationModes {
+  DRIVING
+  BICYCLING
+}
+
+type Courier @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  sub: String!
+  lat: Float
+  lng: Float
+  transportationMode: TransportationModes!
+}
+
 type Basket @model @auth(rules: [{allow: public}]) {
   id: ID!
   BasketDishes: [BasketDish] @hasMany(indexName: "byBasket", fields: ["id"])
@@ -11,6 +25,7 @@ enum OrderStatus {
   READY_FOR_PICKUP
   PICKED_UP
   COMPLETED
+  ACCEPTED
 }
 
 type OrderDish @model @auth(rules: [{allow: public}]) {
@@ -27,6 +42,7 @@ type Order @model @auth(rules: [{allow: public}]) {
   total: Float!
   status: OrderStatus!
   OrderDishes: [OrderDish] @hasMany(indexName: "byOrder", fields: ["id"])
+  Courier: Courier @hasOne
 }
 
 type BasketDish @model @auth(rules: [{allow: public}]) {
