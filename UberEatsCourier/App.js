@@ -8,6 +8,9 @@ import awsconfig from "./src/aws-exports";
 import AuthContextProvider from "./src/contexts/AuthContext";
 import OrderContextProvider from "./src/contexts/OrderContext";
 
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["Setting a timer"]);
+
 Amplify.configure({
   ...awsconfig,
   Analytics: {

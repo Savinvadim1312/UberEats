@@ -1,27 +1,64 @@
 import { useRef, useMemo, useState, useEffect } from "react";
-import { View, Text, useWindowDimensions } from "react-native";
+import {
+  View,
+  Text,
+  useWindowDimensions,
+  ActivityIndicator,
+} from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import orders from "../../../assets/data/orders.json";
+import * as Location from "expo-location";
 import OrderItem from "../../components/OrderItem";
-import MapView, { Marker } from "react-native-maps";
-import { Entypo } from "@expo/vector-icons";
+import MapView from "react-native-maps";
 import { DataStore } from "aws-amplify";
 import { Order } from "../../models";
+import CustomMarker from "../../components/CustomMarker";
 
 const OrdersScreen = () => {
   const [orders, setOrders] = useState([]);
+  const [driverLocation, setDriverLocation] = useState(null);
+
   const bottomSheetRef = useRef(null);
   const { width, height } = useWindowDimensions();
 
   const snapPoints = useMemo(() => ["12%", "95%"], []);
 
-  useEffect(() => {
+  const fetchOrders = () => {
     DataStore.query(Order, (order) =>
       order.status("eq", "READY_FOR_PICKUP")
     ).then(setOrders);
+  };
+
+  useEffect(() => {
+    fetchOrders();
+
+    const subscription = DataStore.observe(Order).subscribe((msg) => {
+      if (msg.opType === "UPDATE") {
+        fetchOrders();
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  console.log(orders);
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (!status === "granted") {
+        console.log("Nonono");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync();
+      setDriverLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    })();
+  }, []);
+
+  if (!driverLocation) {
+    return <ActivityIndicator size={"large"} color="gray" />;
+  }
 
   return (
     <View style={{ backgroundColor: "lightblue", flex: 1 }}>
@@ -32,23 +69,19 @@ const OrdersScreen = () => {
         }}
         showsUserLocation
         followsUserLocation
+        initialRegion={{
+          latitude: driverLocation.latitude,
+          longitude: driverLocation.longitude,
+          latitudeDelta: 0.07,
+          longitudeDelta: 0.07,
+        }}
       >
         {orders.map((order) => (
-          <Marker
+          <CustomMarker
             key={order.id}
-            title={order.Restaurant.name}
-            description={order.Restaurant.address}
-            coordinate={{
-              latitude: order.Restaurant.lat,
-              longitude: order.Restaurant.lng,
-            }}
-          >
-            <View
-              style={{ backgroundColor: "green", padding: 5, borderRadius: 20 }}
-            >
-              <Entypo name="shop" size={24} color="white" />
-            </View>
-          </Marker>
+            data={order.Restaurant}
+            type="RESTAURANT"
+          />
         ))}
       </MapView>
       <BottomSheet ref={bottomSheetRef} snapPoints={snapPoints}>
