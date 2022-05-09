@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "name": "Big Mac",
+    "price": 9.99,
+    "quantity": 2
+  },
+  {
+    "id": "2",
+    "name": "Chicken Nuggets",
+    "price": 6.99,
+    "quantity": 1
+  },
+  {
+    "id": "3",
+    "name": "Big Tasty",
+    "price": 15.99,
+    "quantity": 3
+  }
+]
