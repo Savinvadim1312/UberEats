@@ -23,6 +23,8 @@ const RestaurantContextProvider = ({ children }) => {
     );
   }, [sub]);
 
+  console.log(restaurant?.id);
+
   return (
     <RestaurantContext.Provider value={{ restaurant, setRestaurant, sub }}>
       {children}
@@ -31,6 +33,5 @@ const RestaurantContextProvider = ({ children }) => {
 };
 
 export default RestaurantContextProvider;
-
 
 export const useRestaurantContext = () => useContext(RestaurantContext);

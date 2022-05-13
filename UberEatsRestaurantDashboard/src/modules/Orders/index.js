@@ -29,6 +29,17 @@ const Orders = () => {
     ).then(setOrders);
   }, [restaurant]);
 
+  useEffect(() => {
+    const subscription = DataStore.observe(Order).subscribe((msg) => {
+      const { opType, element } = msg;
+      if (opType === "INSERT" && element.orderRestaurantId === restaurant.id) {
+        setOrders((existingOrders) => [element, ...existingOrders]);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const renderOrderStatus = (orderStatus) => {
     const statusToColor = {
       [OrderStatus.NEW]: "green",
